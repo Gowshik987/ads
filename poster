@@ -1,0 +1,75 @@
+"""Libraries"""
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from scipy.optimize import curve_fit
+import math
+
+def cluster_plot(dataFrame):
+    """Plotting clusters"""
+    dataFrame0 = dataFrame[dataFrame.Cluster_Membership==0]
+    dataFrame1 = dataFrame[dataFrame.Cluster_Membership==1]
+    dataFrame2 = dataFrame[dataFrame.Cluster_Membership==2]
+    dataFrame3 = dataFrame[dataFrame.Cluster_Membership==3]
+    dataFrame4 = dataFrame[dataFrame.Cluster_Membership==4]
+    plt.figure(figsize=(25,10))
+    plt.scatter(dataFrame0['Country Name'],dataFrame0['2010'],color='blue',label='CO2 Emission')
+    plt.scatter(dataFrame1['Country Name'],dataFrame1['2010'],color='yellow',label='CO2 Emission')
+    plt.scatter(dataFrame2['Country Name'],dataFrame2['2010'],color='black',label='CO2 Emission')
+    plt.scatter(dataFrame3['Country Name'],dataFrame3['2010'],color='green',label='CO2 Emission')
+    plt.scatter(dataFrame4['Country Name'],dataFrame4['2010'],color='red',label='CO2 Emission')
+    plt.xlabel('Country Name',size=20)
+    plt.ylabel('Year',size=20)
+    plt.title("CLUSTERING",size=25)
+    plt.legend()
+    plt.show()
+    plt.close()
+
+def centroid_plot(centroid):
+    """Cluster membership vs Cluster centers"""
+    print("Centroids:")
+    print(*centeroid)
+    plt.plot(centeroid)
+    plt.xlabel("Cluster membership")
+    plt.ylabel("Cluster centers")
+    plt.title("Cluster membership vs Cluster centers")
+    plt.show()
+    plt.close()
+def modelFunc(x,a,b):
+    return a+(b*(x**3))
+def fit(x,y):
+    popt,pocv = curve_fit(modelFunc,x,y)
+    xset = np.arange(0.0,5.0,0.01)
+    plt.plot(xset,modelFunc(xset,*popt))
+    plt.title("Curve fitting of the data")
+    plt.show()
+    plt.close()
+"""Reading dataframe"""
+csvFile = pd.read_csv("co2_emission.csv")
+display(csvFile.head())
+
+"""CLUSTERING"""
+countryName = list(csvFile['Country Name'])
+year_2010 = list(csvFile['2010'])
+dataFrame = {"Country Name":countryName,"2010":year_2010}
+dataFrame = pd.DataFrame(dataFrame)
+display(dataFrame.head())
+
+k = KMeans(n_clusters=5) # 5 clusters
+yp = k.fit_predict(dataFrame[['2010']])
+dataFrame.insert(len(dataFrame.columns), 'Cluster_Membership', list(yp))
+print("Sample data after clustering")
+display(dataFrame.head())
+
+"""Centroids"""
+centroid = k.cluster_centers_ 
+
+cluster_plot(dataFrame)
+
+centroid_plot(centroid)
+
+"""Curve fitting"""
+x = [int(i) for i in list(csvFile.columns[1:])]
+y = csvFile.loc[2, :].values.flatten().tolist()[1:]
+fit(x,y)
